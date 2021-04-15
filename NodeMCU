@@ -1,0 +1,57 @@
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial arduinocon(5, 4);
+
+char auth[] = "0wGI8k4qh5Y4rvibpgtBtu0qneRvgfBa" ;
+char ssid[] = "TWAPARTMENT_2.4G_plus" ;
+char pass[] = "1111100000" ;
+char key = '0' ;
+
+
+
+WidgetLCD LCD(V1);
+
+void setup()
+{
+  Serial.begin(9600);
+  arduinocon.begin(9600);
+  Blynk.begin(auth, ssid, pass);
+  
+}
+
+void loop()
+{
+  String ex_str;
+  Blynk.run();
+  while (arduinocon.available() > 0) {
+    char inByte = arduinocon.read();
+    for (int i = 0;i<sizeof(inByte);i++){
+      ex_str += inByte ;
+    }
+    LCD.print(2,0,ex_str);
+    Serial.write(inByte);
+    
+    
+  }
+  while (Serial.available() > 0) {
+    char inByte = Serial.read();
+    arduinocon.write(inByte);
+    Serial.write(inByte);
+  }
+  delay(5000);
+  LCD.clear();
+}
+BLYNK_WRITE(V2){ 
+  Serial.println(param.asInt()); 
+    if (param.asInt()){ 
+        char inByte = '0';
+        arduinocon.write(inByte);
+        
+    } 
+    else {
+ 
+    }
+}
